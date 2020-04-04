@@ -28,17 +28,6 @@ final _i5 = BigInt.from(5);
 final _i10 = BigInt.from(10);
 final _i31 = BigInt.from(31);
 
-BigInt _gcd(BigInt a, BigInt b) {
-  var q = a;
-  var r = b;
-  while (r != _i0) {
-    final d = r;
-    r = q % d;
-    q = d;
-  }
-  return q;
-}
-
 class Rational implements Comparable<Rational> {
   factory Rational(BigInt numerator, [BigInt denominator]) {
     denominator ??= _i1;
@@ -50,7 +39,7 @@ class Rational implements Comparable<Rational> {
     }
     final aNumerator = numerator.abs();
     final aDenominator = denominator.abs();
-    final gcd = _gcd(aNumerator, aDenominator);
+    final gcd = aNumerator.gcd(aDenominator);
     return (gcd == _i1)
         ? Rational._normalized(numerator, denominator)
         : Rational._normalized(numerator ~/ gcd, denominator ~/ gcd);
@@ -96,7 +85,7 @@ class Rational implements Comparable<Rational> {
       : assert(numerator != null),
         assert(denominator != null),
         assert(denominator > _i0),
-        assert(_gcd(numerator.abs(), denominator) == _i1);
+        assert(numerator.abs().gcd(denominator) == _i1);
 
   final BigInt numerator, denominator;
 
@@ -119,10 +108,11 @@ class Rational implements Comparable<Rational> {
   @override
   String toString() {
     if (numerator == _i0) return '0';
-    if (isInteger)
+    if (isInteger) {
       return '$numerator';
-    else
+    } else {
       return '$numerator/$denominator';
+    }
   }
 
   String toDecimalString() {
@@ -274,8 +264,12 @@ class Rational implements Comparable<Rational> {
   bool get hasFinitePrecision {
     // the denominator should only be a product of powers of 2 and 5
     var den = denominator;
-    while (den % _i5 == _i0) den = den ~/ _i5;
-    while (den % _i2 == _i0) den = den ~/ _i2;
+    while (den % _i5 == _i0) {
+      den = den ~/ _i5;
+    }
+    while (den % _i2 == _i0) {
+      den = den ~/ _i2;
+    }
     return den == _i1;
   }
 
@@ -292,7 +286,9 @@ class Rational implements Comparable<Rational> {
       throw StateError('This number has an infinite precision: $this');
     }
     var x = numerator;
-    while (x % denominator != _i0) x *= _i10;
+    while (x % denominator != _i0) {
+      x *= _i10;
+    }
     x = x ~/ denominator;
     return x.abs().toString().length;
   }
@@ -325,7 +321,9 @@ class Rational implements Comparable<Rational> {
       return round().toBigInt().toString();
     } else {
       var mul = _i1;
-      for (var i = 0; i < fractionDigits; i++) mul *= _i10;
+      for (var i = 0; i < fractionDigits; i++) {
+        mul *= _i10;
+      }
       final mulRat = Rational(mul);
       final lessThanOne = abs() < _r1;
       final tmp = (lessThanOne ? (abs() + _r1) : abs()) * mulRat;
@@ -354,7 +352,9 @@ class Rational implements Comparable<Rational> {
     }
 
     var limit = _r1;
-    for (var i = 0; i < precision; i++) limit *= _r10;
+    for (var i = 0; i < precision; i++) {
+      limit *= _r10;
+    }
 
     var shift = _r1;
     var pad = 0;
